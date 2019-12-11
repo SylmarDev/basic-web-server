@@ -19,6 +19,7 @@ public class MyWebServer {
 			BufferedOutputStream bufferedOutputStream0; 
 			Socket clientSocket0; 
 			ServerSocket serverSocket0 = new ServerSocket(PORT_NUM); 
+			serverSocket0.setReuseAddress(true);
 			System.out.println("Listening ...");
 
 			while(true) {
@@ -59,44 +60,33 @@ public class MyWebServer {
 				}
 				File file0 = new File(WEB_DIR, method);
 				int fileSize = (int)file0.length(); 
-				// System.out.println("file0: " + file0.toString() + " length: " + Integer.toString(fileSize));
+				System.out.println("file0: " + file0.toString() + " length: " + Integer.toString(fileSize));
 
 				// read file data
 				byte[] fileContent = readFileData(file0, fileSize);
 
 				// send HTTP Headers of the response
 				// the first header is completed for you
-				// PRINT WRITER ISN'T WORKING, WHY BOTHER>????
-				/*printWriter0.println("HTTP/1.1 200 OK");
+				
+				// send content of requested file 
+				printWriter0.println("HTTP/1.1 200 OK");
 				printWriter0.println("Server: Java Web Server"); // ???
 				printWriter0.println("Date: " + new Date());
 				printWriter0.println("Content-type: " + file0.toString());
 				printWriter0.println("Content-length: " + Integer.toString(fileSize));
-				// a blank line after headers 
-				printWriter0.println(); */
+				// a blank line after headers
+				printWriter0.println();
+				printWriter0.flush();
 				
-				// blank line prior to headers
-				
-				System.out.println(""); 
-				System.out.println("HTTP/1.1 200 OK");
-				System.out.println("Server: Java Web Server"); // ???
-				System.out.println("Date: " + new Date());
-				System.out.println("Content-type: " + file0.toString());
-				System.out.println("Content-length: " + Integer.toString(fileSize));
-				// a blank line after headers 
-				System.out.println("");  
-				
-				printWriter0.flush(); 
-				
-				// send content of requested file 
 				bufferedOutputStream0.write(fileContent);
 				bufferedOutputStream0.flush();
+				
+				bufferedReader0.close();
+				printWriter0.close();
+				bufferedOutputStream0.close();
+				// close the client socket 
+				clientSocket0.close();
 			}
-			bufferedReader0.close(); 
-			printWriter0.close(); 
-			bufferedOutputStream0.close(); 
-			// close the client socket 
-			clientSocket0.close();
 			// close the server socket 
 			serverSocket0.close();
 		} catch (Exception e) {
